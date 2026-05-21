@@ -1,163 +1,190 @@
-# 24 小时食管阻抗-pH 监测分析（病例 001）
+# GERD Monitor — 24h pH-Impedance Analysis for Patients and Clinicians
 
-把一份 24 小时多通道腔内阻抗-pH 监测（MII-pH）数据从原始 CSV 处理成可交互的网页，自动检测反流事件、按 Lyon Consensus 2.0 标准给出诊断，并以**医生视角**和**病人视角**两种模式呈现。
+Interactive, browser-based analysis of 24-hour multichannel intraluminal impedance-pH (MII-pH) monitoring data — the gold-standard test for gastroesophageal reflux disease (GERD). Automatic reflux event detection based on **Lyon Consensus 2.0 (2024)** and **Porto Consensus**, with two distinct UI modes designed for *patients* and *clinicians*.
 
-**🌐 在线 Demo：[gerd-001.pages.dev](https://gerd-001.pages.dev)**（国内、海外均可访问）
+🌐 **Live demo:** https://gerd-001.pages.dev
+📹 **Video walkthrough:** [reflux-timeline-demo.mov on Releases](https://github.com/scintiller/gerd-monitor/releases/download/v0.1/reflux-timeline-demo.mov) (~120 MB)
 
-## 截图
+---
 
-### 病人视角 · 总览
+## The Problem
 
-> 诊断结论 + 关键指标 + 反流次数分布 + 三种类型对比 + 你可能会问 FAQ + 24h 时间序列
+24-hour MII-pH monitoring is the gold standard for diagnosing GERD and characterizing reflux. A typical study produces:
 
-![病人视角总览](docs/screenshots/01-patient-overview.png)
+- **13 channels** of physiological data (1 pH probe + 6 impedance segments along the esophagus + 6 reference electrodes)
+- **50 Hz sampling** for 24 hours → roughly **55 million data points** per study
+- A raw CSV in the **500 MB** range
 
-### 病人视角 · 单次反流事件细节（事件 #2，重度 76.9）
+The data flow today is broken in three ways:
 
-> 自动放大到该事件 ±12s 窗口，标注反流起止、pH 最低点、近端到达高度；右侧严重度分解条直观展示「为什么是重度」（时长 40/40 + 高度 30/30 + pH 6.9/30）
+1. **Existing clinical software is desktop-only and proprietary** — Sandhill BioVIEW, MMS, Diversatek, etc. require Windows installs, dongles, hospital licenses; nothing runs in the browser.
+2. **Patients see almost none of it.** They get a one-page printed summary they cannot interpret, and the underlying study (which they paid for) lives on a hospital workstation forever.
+3. **Even physicians review most studies the same way** — scrolling through hours of data manually, looking for obvious drops. Reflux event detection is rule-based, well-specified by international consensus, and trivially scriptable, yet most clinicians still do it visually.
 
-![病人视角事件细节](docs/screenshots/02-patient-event-detail.png)
+The result: a $500 / ¥3000+ test with rigorous data backing it, but most of the signal never reaches the patient, and a meaningful fraction of physician time is spent on tasks that should be automated.
 
-### 医生视角 · 全局诊断（Lyon Consensus 2.0）
+## What This Project Does
 
-> AET 0.17%、各通道 MNBI、反流次数分布、诊断结论与辅助证据
+A static web application that:
 
-![医生视角总览](docs/screenshots/03-doctor-overview.png)
+1. **Parses raw MII-pH CSV** (Sandhill-style 13-channel format, 24h × 50 Hz).
+2. **Detects every reflux event automatically** using the international consensus algorithm:
+   - **Acid reflux** — pH drops from >4 to <4, sustained ≥5 s
+   - **Bolus reflux (any pH)** — distal impedance falls to ≤50 % of baseline, propagates retrograde (distal-then-proximal) across ≥2 channels, sustained ≥5 s
+   - Per-event classification (acid / weakly acidic / non-acid), proximal extent, pH nadir, severity score
+3. **Computes Lyon Consensus 2.0 parameters** — AET, MNBI, total reflux episodes, longest acid episode, supportive evidence.
+4. **Presents the result two ways:**
 
-### 医生视角 · 单次反流事件（Porto Consensus 检测依据）
+| Mode | Designed for | What you see |
+|------|--------------|--------------|
+| 🧑 **Patient view** | Anyone who took the test | Plain-language diagnosis, "what does this mean for me", FAQ ("I had 32 reflux events — is that normal?"), 3 reflux types compared with food analogies, per-event "what you might feel / what it does to your body" |
+| 🩺 **Clinician view** | Gastroenterologists, GPs reviewing the study | AET / MNBI / Porto detection criteria checklist / severity score breakdown / channel-by-channel MNBI / diagnostic conclusion per Lyon 2.0 thresholds |
 
-> 同一事件展示 Porto Consensus 的所有判定条件（50% 阻抗下降、逆向传播、远端 ≥2 通道、≥5s）+ 严重度评分细节
+5. **Runs entirely in the browser.** No server, no install, no data leaves your machine. Cloudflare Pages or any static host.
 
-![医生视角事件细节](docs/screenshots/04-doctor-event-detail.png)
+## Who Is This For
 
-### 📹 演示视频
+### Patients with reflux symptoms
 
-完整交互演示见 [Release v0.1 附件](https://github.com/scintiller/gerd-monitor/releases/tag/v0.1)（mov, ~120MB）。
+You had a 24-hour pH study. The doctor's report says *"AET 4.5%, 32 episodes — borderline"* and you have no idea what that means. Upload the CSV your hospital gave you (most centers will burn it to a disc on request) and you'll see:
 
-## 数据
+- A traffic-light diagnosis you can read in 30 seconds
+- For every single reflux event over 24 hours: *when*, *how acidic*, *how high up your esophagus it went*, *what symptoms it might explain*, *whether it's worth worrying about*
+- Why "32 events" might still be normal (it usually is — what matters is acid exposure *time*, not count)
+- What questions to ask your doctor next
 
-- `001.rar` / `001.csv` — 病例 001 的 24 小时 MII-pH 原始数据
-  - 13 通道：1 个 pH（5 cm above LES）+ 6 个阻抗段（3·5·7·9·15·17 cm above LES）+ 6 个参考电极
-  - 采样率：50 Hz（统一后），原始 pH/Base 1 Hz，Imp 50 Hz
-  - 记录时长：23.76 小时（4,277,251 样本）
-  - 文件大小：524.8 MB
+### Gastroenterologists & general practitioners
 
-## 项目结构
+You read MII-pH studies and want:
 
-```
-.
-├── 001.rar / 001.csv           # 原始数据
-├── scripts/preprocess.py       # 反流事件检测算法 + 数据精简
-├── data/processed/             # 预处理输出
-│   ├── summary.json            # 全局指标（AET、MNBI、诊断结论等）
-│   ├── events.json             # 所有反流事件 + 标注
-│   ├── overview.json           # 1Hz 总览（约 86k 点/通道）
-│   └── zoom/event_NNNN.json    # 每个事件 ±30s 10Hz 高清窗口
-├── web/                        # 前端（Vite + React + TS + Tailwind + uPlot）
-└── .venv/                      # Python 3.12 虚拟环境
-```
+- Lyon Consensus 2.0 conclusion at a glance (AET vs 4 % / 6 % thresholds, MNBI vs 1500 Ω, supportive evidence)
+- Every reflux event Porto-classified with audit trail (which channels involved, propagation pattern, pH nadir, exact timing)
+- A patient-shareable URL you can drop in WeChat / a patient portal so they understand their own data — improves adherence, reduces follow-up phone calls
+- A clean way to teach trainees what reflux looks like on impedance (the chart annotations explain *why* each event qualifies)
 
-## 反流检测算法（基于国际共识）
+### Researchers
 
-### 阈值标准（Lyon Consensus 2.0, Porto Consensus）
+- Reference implementation of Lyon 2.0 + Porto detection in Python (`scripts/preprocess.py`)
+- Easy to run on a cohort: drop CSVs in, get a directory of processed JSON
+- All thresholds are configurable constants — easy to study sensitivity
 
-- **酸反流**：pH 从 >4 降至 <4，持续 ≥5 秒
-- **bolus 反流**（含酸/弱酸/非酸）：
-  - 最远端阻抗通道下降至基线 50% 以下
-  - 逆向传播：远端先于近端（吞咽则相反）
-  - 至少累及远端 2 个阻抗段
-  - 持续 ≥5 秒
-- **分类**：根据 pH 谷值
-  - `acid` (酸反流): pH 谷值 <4
-  - `weakly_acidic` (弱酸反流): pH 4–7
-  - `non_acid_bolus` / `weakly_alkaline`: pH ≥7
-- **严重度评分**（0–100 分，自定义综合公式）
-  - 时长（0–40 分，1 分钟封顶）
-  - 近端高度（0–30 分，3cm→0，17cm→30）
-  - pH 深度（0–30 分，pH 7→0，pH 0→30）
-  - 分级：<25 轻度 · 25–55 中度 · ≥55 重度
+## Screenshots
 
-### Lyon Consensus 2.0 诊断阈值
+### Patient view — overview
 
-| 指标 | 正常 | 灰区 | 病理 |
-|-----|------|------|------|
-| AET（酸暴露时间） | <4% | 4–6% | >6% |
-| 反流总次数 | — | — | >80/天（辅助证据） |
-| MNBI（远端） | — | — | <1500 Ω（辅助证据） |
+The landing page for non-experts: diagnosis as plain text, four big stats, a visual breakdown of *what kind* of reflux you have, side-by-side comparison of the three reflux categories, and a FAQ answering the questions most patients actually ask.
 
-## 跑起来
+![Patient overview](docs/screenshots/01-patient-overview.png)
 
-### 1. 数据预处理（Python）
+### Patient view — clicking a reflux event
+
+Click any event in the timeline or list, and the chart auto-zooms to a ±12 s window with annotations: where reflux started/ended, the pH nadir, and how high in the esophagus it reached. The severity score is broken down into its three components (duration / proximal extent / pH) so it's obvious *why* the event is rated severe vs. mild.
+
+![Patient event detail](docs/screenshots/02-patient-event-detail.png)
+
+### Clinician view — diagnostic summary
+
+Same data, professional presentation. AET, MNBI per channel, Lyon 2.0 conclusion with thresholds, supportive evidence, channel topology.
+
+![Clinician overview](docs/screenshots/03-doctor-overview.png)
+
+### Clinician view — per-event audit
+
+Every Porto consensus criterion verified inline. Severity breakdown shows the math, not just the label.
+
+![Clinician event detail](docs/screenshots/04-doctor-event-detail.png)
+
+## Try It
+
+- **Sample case (Case 001):** open https://gerd-001.pages.dev — anonymized patient data is pre-loaded
+- **Your own data:** [upload feature coming next — see roadmap below]
+
+## How It Works
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React + TypeScript + Vite + TailwindCSS |
+| Charting | [uPlot](https://github.com/leeoniya/uPlot) — handles millions of points at 60 fps |
+| Detection algorithm | Python (pandas, numpy) — see `scripts/preprocess.py` |
+| Hosting | Cloudflare Pages (static, free, globally CDN'd) |
+
+Algorithm constants and thresholds are documented inline in `scripts/preprocess.py` with citations:
+
+- Gyawali CP et al. *Updates to the modern diagnosis of GERD: Lyon Consensus 2.0.* Gut 2024.
+- Sifrim D et al. *Acid, nonacid, and gas reflux in patients with gastroesophageal reflux disease.* Gastroenterology 2001.
+- Roman S et al. *Ambulatory reflux monitoring for diagnosis of gastro-esophageal reflux disease: Update of the Porto consensus.* Neurogastroenterol Motil 2017.
+
+## Local Development
 
 ```bash
-# 装 uv（如未安装）
-brew install uv
+# 1. Decompress the sample raw data (one-time)
+brew install unar
+unar 001.rar
 
-# 建 venv + 装依赖
+# 2. Set up Python preprocessing
+brew install uv
 uv venv --python 3.12 .venv
 uv pip install pandas numpy scipy pyarrow
-
-# 跑预处理
 .venv/bin/python scripts/preprocess.py
-```
+cp -r data/processed/* web/public/data/
 
-预处理输出会写到 `data/processed/`，然后复制（或软链接）到 `web/public/data/`。
-
-### 2. 网站本地预览
-
-```bash
+# 3. Run the web app
 cd web
 npm install
 npm run dev
+# → http://localhost:5173
 ```
 
-默认端口 `http://localhost:5173`。
-
-### 3. 构建静态站点（待部署）
+## Deployment
 
 ```bash
 cd web
 npm run build
+npx wrangler pages deploy dist --project-name=gerd-001 --branch=main
 ```
 
-输出在 `web/dist/`，可以部署到 Vercel / Netlify / GitHub Pages / 任意静态托管。
+Re-running the same command pushes updates.
 
-## 界面功能
+## Project Structure
 
-### 顶部切换
-- **病人视角**：用日常语言解释结果，4 个大数字卡片+背景知识，每个事件附「为什么这是反流 / 有多严重 / 怎么办」
-- **医生视角**：Lyon Consensus 2.0 标准报告参数、各通道 MNBI、Porto Consensus 检测依据、严重度评分公式
+```
+.
+├── scripts/preprocess.py      # Reflux detection algorithm (Lyon 2.0 / Porto)
+├── data/processed/            # Compact JSON output (~12 MB total)
+│   ├── summary.json           # Global metrics, diagnosis, MNBI
+│   ├── events.json            # All detected reflux events with annotations
+│   └── overview.json          # 1 Hz downsampled time series for charting
+├── web/
+│   ├── src/
+│   │   ├── App.tsx, main.tsx
+│   │   ├── components/        # Timeline, EventList, EventDetail, etc.
+│   │   ├── explain.ts         # Clinical reasoning → plain language
+│   │   ├── data.ts            # JSON loaders
+│   │   └── types.ts
+│   ├── public/data/           # Static-served JSON (copy of data/processed/)
+│   └── scripts-screenshots.mjs # Puppeteer screenshot automation
+├── docs/screenshots/          # README assets
+└── README.md
+```
 
-### 24 小时总览图
-- 顶部彩色色带 = 反流事件（条高度=严重度，颜色=类型）
-- 中间黑色细线 = pH，红色虚线是 pH=4 酸阈
-- 阻抗细节默认隐藏，可按需开启 6 个通道叠加显示
-- 鼠标悬停在色带上显示事件 tooltip
-- 点击色带或事件列表跳转到详情
+## Privacy
 
-### 事件详情
-- 高清放大图（±30s 窗口，10Hz）
-- 红色虚线标记事件起止，粉色背景标识反流时段
-- 4 个关键指标卡（时长 / pH 谷值 / 近端高度 / 累及通道数）
-- 病人视角：3 个故事性说明块
-- 医生视角：Porto Consensus 检测依据 + 严重度评分细节 + 临床提示
+The sample case (Case 001) is anonymized — the original CSV contains a real patient name in the header that has been replaced with "Case 001" on the deployed site. The raw 524 MB CSV and 66 MB RAR are excluded from this repository (`.gitignore`).
 
-## 病例 001 摘要
+When the upload feature ships, **uploaded files are processed entirely client-side** — your data never leaves your browser. Nothing is sent to any server.
 
-- **诊断结论（Lyon Consensus 2.0）**：AET 正常范围（0.17%）
-- **反流总数**：32 次（1 酸 / 31 弱酸 / 0 非酸）
-- **最长酸反流**：9 秒
-- **远端 MNBI**：4020 Ω（>1500 Ω 阈值，粘膜屏障完整）
+## Roadmap
 
-虽然 AET 在正常范围，但 31 次弱酸反流值得关注，尤其结合食管裂孔疝病史。
-弱酸反流在抑酸治疗（PPI）期间常见，也是部分 PPI 抵抗症状的常见原因。
+- [ ] **In-browser CSV upload** (port detection algorithm from Python to TypeScript / WebWorker)
+- [ ] Symptom marker overlay (patient self-reported symptoms during the study)
+- [ ] Sleep/upright split for DeMeester score
+- [ ] PDF clinical report export
+- [ ] Batch analysis mode for research cohorts
 
-## 算法依据
+## Disclaimer
 
-- Gyawali CP et al. **Updates to the modern diagnosis of GERD: Lyon Consensus 2.0**. Gut 2024.
-- Sifrim D et al. **Acid, nonacid, and gas reflux in patients with gastroesophageal reflux disease during ambulatory 24-hour pH-impedance recordings**. Gastroenterology 2001.
-- Roman S et al. **Ambulatory reflux monitoring for diagnosis of gastro-esophageal reflux disease: Update of the Porto consensus**. Neurogastroenterol Motil 2017.
+This tool is intended for **research and educational purposes** and provides **no medical diagnosis or treatment recommendation**. Clinical decisions must be made by a licensed physician with access to the full clinical context.
 
-## 声明
+## License
 
-本工具仅用于研究和教育目的，**不能替代专业医疗诊断**。所有数据已匿名化处理（病例 001）。
+MIT
