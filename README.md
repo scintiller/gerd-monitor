@@ -2,6 +2,38 @@
 
 把一份 24 小时多通道腔内阻抗-pH 监测（MII-pH）数据从原始 CSV 处理成可交互的网页，自动检测反流事件、按 Lyon Consensus 2.0 标准给出诊断，并以**医生视角**和**病人视角**两种模式呈现。
 
+**🌐 在线 Demo：[gerd-001.pages.dev](https://gerd-001.pages.dev)**（国内、海外均可访问）
+
+## 截图
+
+### 病人视角 · 总览
+
+> 诊断结论 + 关键指标 + 反流次数分布 + 三种类型对比 + 你可能会问 FAQ + 24h 时间序列
+
+![病人视角总览](docs/screenshots/01-patient-overview.png)
+
+### 病人视角 · 单次反流事件细节（事件 #2，重度 76.9）
+
+> 自动放大到该事件 ±12s 窗口，标注反流起止、pH 最低点、近端到达高度；右侧严重度分解条直观展示「为什么是重度」（时长 40/40 + 高度 30/30 + pH 6.9/30）
+
+![病人视角事件细节](docs/screenshots/02-patient-event-detail.png)
+
+### 医生视角 · 全局诊断（Lyon Consensus 2.0）
+
+> AET 0.17%、各通道 MNBI、反流次数分布、诊断结论与辅助证据
+
+![医生视角总览](docs/screenshots/03-doctor-overview.png)
+
+### 医生视角 · 单次反流事件（Porto Consensus 检测依据）
+
+> 同一事件展示 Porto Consensus 的所有判定条件（50% 阻抗下降、逆向传播、远端 ≥2 通道、≥5s）+ 严重度评分细节
+
+![医生视角事件细节](docs/screenshots/04-doctor-event-detail.png)
+
+### 📹 演示视频
+
+完整交互演示见 [Release v0.1 附件](https://github.com/scintiller/gerd-monitor/releases/tag/v0.1)（mov, ~120MB）。
+
 ## 数据
 
 - `001.rar` / `001.csv` — 病例 001 的 24 小时 MII-pH 原始数据
