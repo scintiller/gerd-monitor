@@ -1,0 +1,30 @@
+# 原始数据（524MB，超出 GitHub 单文件 100MB 限制 + 隐私考虑）
+001.csv
+001.rar
+*.csv
+*.rar
+
+# Python 虚拟环境
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+.npm
+.eslintcache
+
+# 构建产物
+web/dist/
+dist/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# 本地缓存
+.cache/
+.parcel-cache/
+.wrangler/

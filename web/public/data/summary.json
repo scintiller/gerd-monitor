@@ -1,0 +1,34 @@
+{
+  "recording_duration_h": 23.76,
+  "sample_rate_hz": 50.0,
+  "aet_percent": 0.17,
+  "aet_threshold_pathological": 6.0,
+  "aet_threshold_normal": 4.0,
+  "diagnosis": "AET 正常范围",
+  "diagnosis_level": "normal",
+  "total_reflux_episodes": 32,
+  "acid_episodes": 1,
+  "weakly_acidic_episodes": 31,
+  "non_acid_episodes": 0,
+  "longest_acid_episode_s": 9.0,
+  "long_episodes_over_5min": 0,
+  "mnbi_per_channel": {
+    "Imp11": 4065.0,
+    "Imp12": 3975.0,
+    "Imp13": 3439.0,
+    "Imp14": 2978.0,
+    "Imp16": 1948.0,
+    "Imp17": 2073.0
+  },
+  "mnbi_distal_mean": 4020.0,
+  "mnbi_threshold_abnormal": 1500,
+  "supportive_evidence": [],
+  "channel_positions_cm": {
+    "Imp11": 3,
+    "Imp12": 5,
+    "Imp13": 7,
+    "Imp14": 9,
+    "Imp16": 15,
+    "Imp17": 17
+  }
+}
