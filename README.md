@@ -70,6 +70,12 @@ You read MII-pH studies and want:
 
 ## Screenshots
 
+### Landing — choose what to analyze
+
+Two entry points: drop in your own CSV (processed entirely in the browser, never uploaded), or open the anonymized sample case.
+
+![Landing](docs/screenshots/00-landing.png)
+
 ### Patient view — overview
 
 The landing page for non-experts: diagnosis as plain text, four big stats, a visual breakdown of *what kind* of reflux you have, side-by-side comparison of the three reflux categories, and a FAQ answering the questions most patients actually ask.
@@ -96,8 +102,8 @@ Every Porto consensus criterion verified inline. Severity breakdown shows the ma
 
 ## Try It
 
-- **Sample case (Case 001):** open https://gerd-001.pages.dev — anonymized patient data is pre-loaded
-- **Your own data:** [upload feature coming next — see roadmap below]
+- **Sample case (Case 001):** open https://gerd-001.pages.dev and click *先看一下样例* — anonymized patient data instantly loaded
+- **Your own data:** on the same page, drop your CSV (Sandhill 13-channel format) into the upload box. Parsing and detection happen entirely in a WebWorker in your browser — **nothing is sent to any server**. A 500 MB file typically processes in 1–2 minutes.
 
 ## How It Works
 
@@ -175,7 +181,7 @@ When the upload feature ships, **uploaded files are processed entirely client-si
 
 ## Roadmap
 
-- [ ] **In-browser CSV upload** (port detection algorithm from Python to TypeScript / WebWorker)
+- [x] **In-browser CSV upload** — detection algorithm ported from Python to TypeScript WebWorker; ~500 MB CSVs analyzed locally in 1–2 minutes, no server involved
 - [ ] Symptom marker overlay (patient self-reported symptoms during the study)
 - [ ] Sleep/upright split for DeMeester score
 - [ ] PDF clinical report export
