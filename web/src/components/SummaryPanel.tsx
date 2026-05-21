@@ -129,31 +129,38 @@ function RefluxBreakdown({ summary }: { summary: Summary }) {
 function TypesComparison() {
   const order: RefluxType[] = ['acid', 'weakly_acidic', 'non_acid_bolus'];
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-      <div className="text-sm font-medium text-slate-700 mb-1">三种反流类型，到底有什么不同？</div>
-      <div className="text-xs text-slate-500 mb-3">同样是"胃里的东西冲上来"，但酸性不同，对身体的影响也完全不同</div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {order.map((t) => {
-          const p = TYPE_PROFILE[t];
-          const color = TYPE_COLOR[t];
-          return (
-            <div key={t} className="border border-slate-200 rounded-lg overflow-hidden">
-              <div className="px-3 py-2 text-white text-sm font-medium" style={{ background: color }}>
-                {TYPE_PATIENT_LABEL[t]}
-                <span className="ml-2 text-white/80 text-xs font-normal">{p.ph}</span>
+    <details className="bg-white rounded-lg shadow-sm border border-slate-200 group">
+      <summary className="p-4 cursor-pointer list-none flex items-center justify-between hover:bg-slate-50/50 transition rounded-lg">
+        <div>
+          <div className="text-sm font-medium text-slate-700">三种反流类型，到底有什么不同？</div>
+          <div className="text-xs text-slate-500 mt-0.5">同样是"胃里的东西冲上来"，但酸性不同，对身体的影响也完全不同 · 点击展开详情</div>
+        </div>
+        <span className="text-slate-400 group-open:rotate-90 transition-transform text-sm">▸</span>
+      </summary>
+      <div className="px-4 pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {order.map((t) => {
+            const p = TYPE_PROFILE[t];
+            const color = TYPE_COLOR[t];
+            return (
+              <div key={t} className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="px-3 py-2 text-white text-sm font-medium" style={{ background: color }}>
+                  {TYPE_PATIENT_LABEL[t]}
+                  <span className="ml-2 text-white/80 text-xs font-normal">{p.ph}</span>
+                </div>
+                <div className="p-3 space-y-2 text-xs leading-relaxed">
+                  <Field label="🍋 大致酸度" text={p.analogy} />
+                  <Field label="🌀 怎么产生" text={p.cause} />
+                  <Field label="😣 可能的症状" text={p.symptoms} />
+                  <Field label="🩺 健康影响" text={p.damage} />
+                  <Field label="⚠️ 什么时候要担心" text={p.whenToWorry} highlight />
+                </div>
               </div>
-              <div className="p-3 space-y-2 text-xs leading-relaxed">
-                <Field label="🍋 大致酸度" text={p.analogy} />
-                <Field label="🌀 怎么产生" text={p.cause} />
-                <Field label="😣 可能的症状" text={p.symptoms} />
-                <Field label="🩺 健康影响" text={p.damage} />
-                <Field label="⚠️ 什么时候要担心" text={p.whenToWorry} highlight />
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </details>
   );
 }
 
