@@ -70,24 +70,14 @@ function App() {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
         <header className="bg-white border-b border-slate-200">
-          <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                食
-              </div>
-              <div>
-                <h1 className="text-base font-semibold text-slate-900 leading-tight">食管阻抗-pH 监测分析</h1>
-                <div className="text-xs text-slate-500">基于 Lyon Consensus 2.0</div>
-              </div>
+          <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+              食
             </div>
-            <a
-              href="https://github.com/scintiller/gerd-monitor"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-slate-500 hover:text-slate-900"
-            >
-              GitHub ↗
-            </a>
+            <div>
+              <h1 className="text-base font-semibold text-slate-900 leading-tight">食管阻抗-pH 监测分析</h1>
+              <div className="text-xs text-slate-500">基于 Lyon Consensus 2.0</div>
+            </div>
           </div>
         </header>
         <main className="flex-1">
